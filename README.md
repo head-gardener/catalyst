@@ -1,0 +1,3 @@
+# Catalyst
+
+Quick project configuration.
