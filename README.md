@@ -1,5 +1,7 @@
 # Catalyst
 
+![image](https://github.com/head-gardener/catalyst/assets/49650767/109693f7-f946-4ee3-aa63-0945d3249a8d)
+
 Quick project configuration for neovim.
 
 # Install
