@@ -2,20 +2,13 @@ local ui = require("catalyst.ui")
 local cf = require("catalyst.config")
 
 local iron = require("iron.core")
-local Menu = require("nui.menu")
 
 local function setup(opts)
   local config = cf.new(opts)
 
   local function pick()
-    local lines = {}
-    for key, _ in pairs(config.presets) do
-      table.insert(lines, Menu.item(key))
-    end
-    local display = ui.display_fact()
-    local picker = ui.menu_fact(config, lines, display)
-    local layout = ui.layout_fact(picker, display)
-    layout:mount()
+    local picker = ui.picker(config)
+    picker:mount()
   end
 
   local function run()
@@ -58,6 +51,13 @@ local function setup(opts)
   vim.api.nvim_create_user_command('CatlTest',
     test,
     { nargs = '?' })
+
+  vim.api.nvim_create_autocmd('DirChanged', {
+    callback = function()
+      cf.sync(config)
+    end,
+  })
+  cf.sync(config)
 
   set_keymaps(opts.keymaps)
 end
