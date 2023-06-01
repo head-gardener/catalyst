@@ -30,6 +30,22 @@ local function setup(opts)
     iron.send('fish', cf.get(config).test)
   end
 
+  local function set_keymaps(keymaps)
+    if keymaps == nil then return end
+    if keymaps.pick then
+      vim.keymap.set('n', keymaps.pick, pick, { remap = false })
+    end
+    if keymaps.run then
+      vim.keymap.set('n', keymaps.run, run, { remap = false })
+    end
+    if keymaps.build then
+      vim.keymap.set('n', keymaps.build, build, { remap = false })
+    end
+    if keymaps.test then
+      vim.keymap.set('n', keymaps.test, test, { remap = false })
+    end
+  end
+
   vim.api.nvim_create_user_command('CatlPick',
     pick,
     { nargs = '?' })
@@ -42,6 +58,8 @@ local function setup(opts)
   vim.api.nvim_create_user_command('CatlTest',
     test,
     { nargs = '?' })
+
+  set_keymaps(opts.keymaps)
 end
 
 return {
