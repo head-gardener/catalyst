@@ -41,7 +41,7 @@ end
 
 local M = {}
 
-local function display_fact()
+local function display()
   return Popup({
     enter = false,
     border = {
@@ -55,7 +55,7 @@ local function display_fact()
   })
 end
 
-local function menu_fact(config, lines, d)
+local function menu(config, lines, d)
   return Menu({
     position = "50%",
     size = {
@@ -94,15 +94,16 @@ function M.picker(config)
     table.insert(lines, Menu.item(key))
   end
 
-  local d = display_fact()
-  local m = menu_fact(config, lines, d)
+  local d = display()
+  local m = menu(config, lines, d)
 
   return Layout(
     {
+      relative = "editor",
       position = "50%",
       size = {
-        width = 80,
-        height = "60%",
+        width = 60,
+        height = "30%",
       },
     },
     Layout.Box({
