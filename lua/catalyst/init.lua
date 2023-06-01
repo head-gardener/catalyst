@@ -5,11 +5,9 @@ local function setup(opts)
   local iron = require("iron.core")
 
   local presets = {
-    cabal = { run = "cabal run", build = "cabal build", test = "cabal test" },
-    cargo = { run = "cargo run", build = "cargo build", test = "cargo test" },
-    make = { run = "make build && build/bin", build = "make build", test = "make check" },
-    cmake = { run = "cmake run", build = "cmake build", test = "cmake check" },
+    make = { run = "build/bin", build = "make build", test = "make check" },
   }
+  if opts.presets then presets = opts.presets end
 
   local function prettify(a)
     return { "run: " .. a.run, "build: " .. a.build, "test: " .. a.test }
