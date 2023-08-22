@@ -72,9 +72,9 @@ function M.prettify(a)
   return { "run: " .. a.run, "build: " .. a.build, "test: " .. a.test }
 end
 
-M.preset = "cabal"
+M.selected = "make"
 
-function M.preset(state)
+function M.selected(state)
   return state.presets[state.preset]
 end
 
@@ -82,13 +82,13 @@ function M.select(state, x)
   state.preset = x
 end
 
-function M.get(state)
+function M.current(state)
   return state.b_sys
 end
 
 function M.confirm(state)
-  state.b_sys = M.preset(state)
-  print(vim.inspect(M.get(state).run))
+  state.b_sys = M.selected(state)
+  print(vim.inspect(M.current(state).run))
 end
 
 return M

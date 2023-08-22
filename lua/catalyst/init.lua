@@ -12,15 +12,15 @@ local function setup(opts)
   end
 
   local function run()
-    iron.send('fish', cf.get(config).run)
+    iron.send('fish', cf.current(config).run)
   end
 
   local function build()
-    iron.send('fish', cf.get(config).build)
+    iron.send('fish', cf.current(config).build)
   end
 
   local function test()
-    iron.send('fish', cf.get(config).test)
+    iron.send('fish', cf.current(config).test)
   end
 
   local function set_keymaps(keymaps)

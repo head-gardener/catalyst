@@ -5,6 +5,8 @@ local event = require("nui.utils.autocmd").event
 
 local cf = require("catalyst.config")
 
+local M = {}
+
 local function persist_dialogue(data)
   local input = Menu({
     position = "50%",
@@ -39,23 +41,45 @@ local function persist_dialogue(data)
   return input
 end
 
-local M = {}
-
-local function display()
-  return Popup({
-    enter = false,
-    border = {
-      style = "single",
-      padding = { 0, 2 },
-      text = {
-        top = "-Build-System-",
-        top_align = "center",
-      },
-    },
-  })
+local function selected_display()
+  local this =
+      Popup({
+        enter = false,
+        border = {
+          style = "single",
+          padding = { 0, 2 },
+          text = {
+            top = "-Selected-",
+            top_align = "center",
+          },
+        },
+      })
+  return
+      this,
+      function(config)
+        vim.api.nvim_buf_set_lines(this.bufnr, 0, -1, false, cf.prettify(cf.selected(config)))
+      end
 end
 
-local function menu(config, lines, d)
+local function current_display(cfg)
+  local this =
+      Popup({
+        enter = false,
+        border = {
+          style = "single",
+          padding = { 0, 2 },
+          text = {
+            top = "-Current-",
+            top_align = "center",
+          },
+        },
+      })
+
+  vim.api.nvim_buf_set_lines(this.bufnr, 0, -1, false, cf.prettify(cf.current(cfg)))
+  return this
+end
+
+local function menu(config, lines, update)
   return Menu({
     position = "50%",
     size = {
@@ -79,11 +103,11 @@ local function menu(config, lines, d)
     },
     on_change = function(item)
       cf.select(config, item.text)
-      vim.api.nvim_buf_set_lines(d.bufnr, 0, -1, false, cf.prettify(cf.preset(config)))
+      update(config)
     end,
     on_submit = function()
       cf.confirm(config)
-      persist_dialogue(cf.preset(config)):mount()
+      persist_dialogue(cf.selected(config)):mount()
     end,
   })
 end
@@ -94,21 +118,24 @@ function M.picker(config)
     table.insert(lines, Menu.item(key))
   end
 
-  local d = display()
-  local m = menu(config, lines, d)
+  local s, upd = selected_display()
+  local c = current_display(config)
+  local m = menu(config, lines, upd)
+  local width = 80
 
   return Layout(
     {
       relative = "editor",
       position = "50%",
       size = {
-        width = 60,
+        width = width,
         height = "30%",
       },
     },
     Layout.Box({
-      Layout.Box(m, { size = "30%" }),
-      Layout.Box(d, { size = "70%" }),
+      Layout.Box(m, { size = "20%" }),
+      Layout.Box(s, { size = "40%" }),
+      Layout.Box(c, { size = "40%" }),
     }, { dir = "row" })
   )
 end
