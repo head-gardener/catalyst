@@ -3,6 +3,8 @@ local M = {}
 -- might want to replace this with sqlite if performance tanks too much
 -- until then simplicity should be way more important
 
+DEFAULT_PRESETS = { make = { run = "build/bin", build = "make build", test = "make check" } }
+
 local function cfg_path()
   return vim.fn.stdpath('data') .. '/catalyst.json'
 end
@@ -50,9 +52,10 @@ function M.persist(conf)
 end
 
 function M.new(opts)
-  local ps = { make = { run = "build/bin", build = "make build", test = "make check" } }
-  if opts.presets then ps = opts.presets end
+  if opts == nil then opts = {} end
 
+  local ps
+  if opts.presets then ps = opts.presets else ps = DEFAULT_PRESETS end
 
   local p = next(ps, nil)
   local b_sys = nil
@@ -82,13 +85,16 @@ function M.select(state, x)
   state.preset = x
 end
 
+function M.edit(state, b_sys)
+  state.b_sys = b_sys
+end
+
 function M.current(state)
   return state.b_sys
 end
 
 function M.confirm(state)
   state.b_sys = M.selected(state)
-  print(vim.inspect(M.current(state).run))
 end
 
 return M

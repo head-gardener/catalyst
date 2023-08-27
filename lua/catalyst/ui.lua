@@ -7,38 +7,13 @@ local cf = require("catalyst.config")
 
 local M = {}
 
-local function persist_dialogue(data)
-  local input = Menu({
-    position = "50%",
-    size = {
-      width = 25,
-      height = 1,
-    },
-    border = {
-      style = "single",
-    },
-    win_options = {
-      winhighlight = "Normal:Normal,FloatBorder:Normal",
-    },
-  }, {
-    lines = {
-      Menu.item("Save setting? (y/n)"),
-    },
-    max_width = 20,
-    keymap = {
-      close = { "n", "N", "<C-c>", "<Esc>" },
-      submit = { "y", "<CR>", "Y" },
-    },
-    on_submit = function()
-      cf.persist(data)
-    end,
-  })
+local function persist_dialogue(preset)
+  local user_input =
+      vim.fn.confirm("Remember choice for current directory?", "&Yes\n&No", 2)
 
-  input:on(event.BufLeave, function()
-    input:unmount()
-  end)
-
-  return input
+  if user_input == 1 then
+    cf.persist(preset)
+  end
 end
 
 local function selected_display()
@@ -79,8 +54,8 @@ local function current_display(cfg)
   return this
 end
 
-local function menu(config, lines, update)
-  return Menu({
+local function picker_menu(cfg, lines, upd_sel)
+  local menu = Menu({
     position = "50%",
     size = {
       width = 25,
@@ -102,42 +77,55 @@ local function menu(config, lines, update)
       submit = { "<CR>", "<Space>" },
     },
     on_change = function(item)
-      cf.select(config, item.text)
-      update(config)
+      cf.select(cfg, item.text)
+      upd_sel(cfg)
     end,
     on_submit = function()
-      cf.confirm(config)
-      persist_dialogue(cf.selected(config)):mount()
+      cf.confirm(cfg)
+      persist_dialogue(cf.selected(cfg))
     end,
   })
+
+  return menu
 end
 
-function M.picker(config)
+local function picker(s, c, m)
+  local p = Layout(
+    {
+      relative = "editor",
+      position = "50%",
+      grow = 2,
+      size = {
+        width = 80,
+        height = 14,
+      },
+    },
+    Layout.Box({
+      Layout.Box(m, { size = { width = 15 } }),
+      Layout.Box({
+        Layout.Box(s, { size = "50%" }),
+        Layout.Box(c, { size = "50%" }),
+      }, { dir = "col", grow = 1 }),
+    }, { dir = "row" })
+  )
+
+  -- TODO: unmount on losing focus
+
+  p:mount()
+  return p
+end
+
+function M.pick(cfg)
   local lines = {}
-  for key, _ in pairs(config.presets) do
+  for key, _ in pairs(cfg.presets) do
     table.insert(lines, Menu.item(key))
   end
 
   local s, upd = selected_display()
-  local c = current_display(config)
-  local m = menu(config, lines, upd)
-  local width = 80
+  local c = current_display(cfg)
+  local m = picker_menu(cfg, lines, upd)
 
-  return Layout(
-    {
-      relative = "editor",
-      position = "50%",
-      size = {
-        width = width,
-        height = "30%",
-      },
-    },
-    Layout.Box({
-      Layout.Box(m, { size = "20%" }),
-      Layout.Box(s, { size = "40%" }),
-      Layout.Box(c, { size = "40%" }),
-    }, { dir = "row" })
-  )
+  picker(s, c, m)
 end
 
 return M

@@ -3,41 +3,51 @@ local cf = require("catalyst.config")
 
 local iron = require("iron.core")
 
+local M = {}
+
+local function set_keymaps(mod, keymaps)
+  if keymaps == nil then return end
+
+  if keymaps.pick then
+    vim.keymap.set('n', keymaps.pick, mod.pick, { remap = true })
+  end
+  if keymaps.run then
+    vim.keymap.set('n', keymaps.run, mod.run, { remap = false })
+  end
+  if keymaps.build then
+    vim.keymap.set('n', keymaps.build, mod.build, { remap = false })
+  end
+  if keymaps.test then
+    vim.keymap.set('n', keymaps.test, mod.test, { remap = false })
+  end
+end
+
 local function setup(opts)
-  local config = cf.new(opts)
+  if opts == nil then opts = {} end
+  local cfg = cf.new(opts)
+
+  print('reload')
 
   local function pick()
-    local picker = ui.picker(config)
-    picker:mount()
+    ui.pick(cfg)
   end
 
   local function run()
-    iron.send('fish', cf.current(config).run)
+    iron.send('fish', cf.current(cfg).run)
   end
 
   local function build()
-    iron.send('fish', cf.current(config).build)
+    iron.send('fish', cf.current(cfg).build)
   end
 
   local function test()
-    iron.send('fish', cf.current(config).test)
+    iron.send('fish', cf.current(cfg).test)
   end
 
-  local function set_keymaps(keymaps)
-    if keymaps == nil then return end
-    if keymaps.pick then
-      vim.keymap.set('n', keymaps.pick, pick, { remap = false })
-    end
-    if keymaps.run then
-      vim.keymap.set('n', keymaps.run, run, { remap = false })
-    end
-    if keymaps.build then
-      vim.keymap.set('n', keymaps.build, build, { remap = false })
-    end
-    if keymaps.test then
-      vim.keymap.set('n', keymaps.test, test, { remap = false })
-    end
-  end
+  M.pick = pick
+  M.run = run
+  M.build = build
+  M.test = test
 
   vim.api.nvim_create_user_command('CatlPick',
     pick,
@@ -54,14 +64,13 @@ local function setup(opts)
 
   vim.api.nvim_create_autocmd('DirChanged', {
     callback = function()
-      cf.sync(config)
+      cf.sync(cfg)
     end,
   })
-  cf.sync(config)
+  cf.sync(cfg)
 
-  set_keymaps(opts.keymaps)
+  set_keymaps(M, opts.keymaps)
 end
 
-return {
-  setup = setup
-}
+M.setup = setup
+return M
