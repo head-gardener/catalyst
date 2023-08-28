@@ -31,7 +31,7 @@ local function write(cfg)
   end
 
   storage:write(vim.fn.json_encode(cfg))
-  print("Updated catalyst configuration")
+  print("Updated catalyst configuration at " .. path)
   storage:close()
 end
 
@@ -58,17 +58,31 @@ function M.new(opts)
   if opts.presets then ps = opts.presets else ps = DEFAULT_PRESETS end
 
   local p = next(ps, nil)
-  local b_sys = nil
-  if p ~= nil then b_sys = ps[p] end
+  local cfg = nil
+  if p ~= nil then cfg = ps[p] end
 
-  return { presets = ps, preset = p, b_sys = b_sys }
+  return { presets = ps, preset = p, cfg = cfg }
 end
 
 function M.sync(state)
   local cfg = read()[vim.fn.getcwd()]
   if cfg ~= nil then
-    state.b_sys = cfg.build_system
+    state.cfg = cfg.build_system
   end
+end
+
+function M.wrap(wrapper, state)
+  local a = {}
+  local b = {}
+  local on_write = function(cfg)
+    M.edit(state, cfg)
+  end
+
+  a[1], b[1] = wrapper("run", M.current(state).run, on_write)
+  a[2], b[2] = wrapper("build", M.current(state).build, on_write)
+  a[3], b[3] = wrapper("test", M.current(state).test, on_write)
+
+  return a, b
 end
 
 function M.prettify(a)
@@ -85,16 +99,24 @@ function M.select(state, x)
   state.preset = x
 end
 
-function M.edit(state, b_sys)
-  state.b_sys = b_sys
+function M.edit(state, cfg)
+  if cfg.run ~= nil then
+    state.cfg.run = cfg.run
+  end
+  if cfg.build ~= nil then
+    state.cfg.build = cfg.build
+  end
+  if cfg.test ~= nil then
+    state.cfg.test = cfg.test
+  end
 end
 
 function M.current(state)
-  return state.b_sys
+  return state.cfg
 end
 
 function M.confirm(state)
-  state.b_sys = M.selected(state)
+  state.cfg = M.selected(state)
 end
 
 return M

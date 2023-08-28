@@ -26,8 +26,6 @@ local function setup(opts)
   if opts == nil then opts = {} end
   local cfg = cf.new(opts)
 
-  print('reload')
-
   local function pick()
     ui.pick(cfg)
   end
