@@ -12,14 +12,19 @@ With `packer.nvim`
 use { 
   "head-gardener/catalyst",
   requires = {
-    "hkupty/iron.nvim"
+    "hkupty/iron.nvim",
+    "MunifTanjim/nui.nvim",
   }
 }
 ```
 
+On dependencies:
+- `iron.nvim` provides a terminal. Will be optional in the future.
+- `nui.nvim` provides UI components. Might be replaced with telescope at some point.
+
 # Configure
 
-Call `setup` with empty table
+Call `setup` with empty table for defaults
 
 ```lua
 require('catalyst').setup({})
