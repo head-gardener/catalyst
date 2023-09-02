@@ -1,5 +1,5 @@
 local ui = require("catalyst.ui")
-local cf = require("catalyst.config")
+local st = require("catalyst.state")
 
 local iron = require("iron.core")
 
@@ -24,22 +24,22 @@ end
 
 local function setup(opts)
   if opts == nil then opts = {} end
-  local cfg = cf.new(opts)
+  local state = st.setup(opts)
 
   local function pick()
-    ui.pick(cfg)
+    ui.pick(state)
   end
 
   local function run()
-    iron.send('fish', cf.current(cfg).run)
+    iron.send('fish', state.config:system().run)
   end
 
   local function build()
-    iron.send('fish', cf.current(cfg).build)
+    iron.send('fish', state.config:system().build)
   end
 
   local function test()
-    iron.send('fish', cf.current(cfg).test)
+    iron.send('fish', state.config:system().test)
   end
 
   M.pick = pick
@@ -62,10 +62,10 @@ local function setup(opts)
 
   vim.api.nvim_create_autocmd('DirChanged', {
     callback = function()
-      cf.sync(cfg)
+      st.ps.sync(state.config)
     end,
   })
-  cf.sync(cfg)
+  st.ps.sync(state.config)
 
   set_keymaps(M, opts.keymaps)
 end

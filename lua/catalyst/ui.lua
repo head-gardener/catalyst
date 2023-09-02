@@ -2,7 +2,7 @@ local Menu = require("nui.menu")
 local Popup = require("nui.popup")
 local Layout = require("nui.layout")
 
-local cf = require("catalyst.config")
+local st = require("catalyst.state")
 
 local M = {}
 
@@ -14,7 +14,7 @@ local function make_pair(a, b, on_write)
       readonly = true,
     },
     win_options = {
-      winhighlight = "Normal:StatusLine",
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
     },
     border = {
       padding = { 0, 2 },
@@ -28,6 +28,9 @@ local function make_pair(a, b, on_write)
         border = {
           style = "solid",
           padding = { 0, 0 },
+        },
+        win_options = {
+          winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
         },
       })
 
@@ -46,11 +49,11 @@ local function make_pair(a, b, on_write)
 end
 
 local function wrap_cfg(state)
-  local a, b = cf.wrap(make_pair, state)
+  local a, b = state.config:wrap(make_pair)
 
   -- is this correct?
   b[1]:on({ "BufUnload" }, function()
-    coroutine.resume(state.ctrl)
+    state.ctl:resume()
   end)
 
   local a_bs = {}
@@ -129,7 +132,7 @@ local function persist_dialogue(state)
       vim.fn.confirm("Remember choice for current directory?", "&Yes\n&No", 2)
 
   if user_input == 1 then
-    cf.persist(cf.current(state))
+    st.ps.persist(state.config)
   end
 end
 
@@ -149,12 +152,12 @@ local function picker(state)
         })
     return
         this,
-        function(config)
-          vim.api.nvim_buf_set_lines(this.bufnr, 0, -1, false, cf.prettify(cf.selected(config)))
+        function(pp)
+          vim.api.nvim_buf_set_lines(this.bufnr, 0, -1, false, st.prettify(pp:selected()))
         end
   end
 
-  local function current_display(c)
+  local function current_display(s)
     local this =
         Popup({
           enter = false,
@@ -168,11 +171,11 @@ local function picker(state)
           },
         })
 
-    vim.api.nvim_buf_set_lines(this.bufnr, 0, -1, false, cf.prettify(cf.current(c)))
+    vim.api.nvim_buf_set_lines(this.bufnr, 0, -1, false, st.prettify(s.config:system()))
     return this
   end
 
-  local function picker_menu(c, lines, upd_sel)
+  local function picker_menu(s, pp, lines, upd_sel)
     local menu = Menu({
       position = "50%",
       size = {
@@ -195,12 +198,12 @@ local function picker(state)
         submit = { "<CR>", "<Space>" },
       },
       on_change = function(item)
-        cf.select(c, item.text)
-        upd_sel(c)
+        pp:select(item.text)
+        upd_sel(pp)
       end,
       on_submit = function()
-        cf.confirm(c)
-        coroutine.resume(state.ctrl)
+        pp:confirm(s.config)
+        state.ctl:resume()
       end,
     })
 
@@ -208,13 +211,14 @@ local function picker(state)
   end
 
   local lines = {}
-  for key, _ in pairs(state.presets) do
+  for key, _ in pairs(state.config:presets()) do
     table.insert(lines, Menu.item(key))
   end
 
+  local pp = st.picker.setup(state.config)
   local s, upd = selected_display()
   local c = current_display(state)
-  local m = picker_menu(state, lines, upd)
+  local m = picker_menu(state, pp, lines, upd)
 
   local p = Layout(
     {
@@ -262,15 +266,16 @@ local function controller(state)
           post()
         end
       end
-      coroutine.yield()
+      state.ctl:yield()
     end
     print('exit')
   end)
 end
 
 function M.pick(state)
-  state.ctrl = controller(state)
-  coroutine.resume(state.ctrl)
+  local thr = controller(state)
+  st.ui_ctl.start(state, thr)
+  state.ctl:resume()
 end
 
 return M
