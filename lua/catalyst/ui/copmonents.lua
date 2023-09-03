@@ -112,22 +112,22 @@ local function wrap_cfg(state)
   end
 end
 
-local function editor(state)
+function M.editor(state)
   local this, post = wrap_cfg(state)
 
   coroutine.yield(this, post)
 end
 
-local function edit_dialogue(state)
+function M.edit_dialogue(state)
   local user_input =
       vim.fn.confirm("Edit commands?", "&Yes\n&No", 2)
 
   if user_input == 1 then
-    editor(state)
+    M.editor(state)
   end
 end
 
-local function persist_dialogue(state)
+function M.persist_dialogue(state)
   local user_input =
       vim.fn.confirm("Remember choice for current directory?", "&Yes\n&No", 2)
 
@@ -136,7 +136,7 @@ local function persist_dialogue(state)
   end
 end
 
-local function picker(state)
+function M.picker(state)
   local function selected_display()
     local this =
         Popup({
@@ -242,39 +242,6 @@ local function picker(state)
   -- TODO: unmount on losing focus
 
   coroutine.yield(p)
-end
-
-local function ui_spawner(state)
-  return coroutine.create(function()
-    picker(state)
-    edit_dialogue(state)
-    persist_dialogue(state)
-  end)
-end
-
-local function controller(state)
-  return coroutine.create(function()
-    local spawner = ui_spawner(state)
-    while coroutine.status(spawner) ~= "dead" do
-      local ok, obj, post = coroutine.resume(spawner)
-      if not ok then
-        print(obj)
-        error()
-      else
-        obj:mount()
-        if post ~= nil then
-          post()
-        end
-      end
-      state.ctl:yield()
-    end
-    print('exit')
-  end)
-end
-
-function M.pick(state)
-  local thr = controller(state)
-  st.ui_ctl.start(state, thr)
 end
 
 return M
