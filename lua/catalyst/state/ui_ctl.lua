@@ -12,6 +12,7 @@ function M.start(state, thr)
   end
 
   state.ctl = ctl
+  state.ctl:resume()
 end
 
 return M

@@ -215,7 +215,7 @@ local function picker(state)
     table.insert(lines, Menu.item(key))
   end
 
-  local pp = st.picker.setup(state.config)
+  local pp = st.picker.setup(state.config:presets())
   local s, upd = selected_display()
   local c = current_display(state)
   local m = picker_menu(state, pp, lines, upd)
@@ -275,7 +275,6 @@ end
 function M.pick(state)
   local thr = controller(state)
   st.ui_ctl.start(state, thr)
-  state.ctl:resume()
 end
 
 return M

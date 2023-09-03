@@ -1,9 +1,9 @@
 local M = {}
 
-function M.setup(config)
+function M.setup(presets)
   local this = {}
 
-  this.presets = config:presets()
+  this.presets = presets
   this.selected = nil
 
   this.preset = next(this.presets, nil)
