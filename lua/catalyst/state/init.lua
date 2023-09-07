@@ -2,6 +2,7 @@ local M = {}
 
 -- fields
 local cf = require('catalyst.state.config')
+local ss = require('catalyst.state.session')
 
 -- functional modules
 M.ps = require('catalyst.state.ps')
@@ -12,8 +13,11 @@ M.ui_ctl = require('catalyst.state.ui_ctl')
 M.prettify = require('catalyst.state.config').prettify
 
 function M.setup(opts)
+  local s = ss.setup(opts)
   return {
-    config = cf.setup(opts),
+    config = s.config,
+    ps = s.ps,
+    session = s,
   }
 end
 

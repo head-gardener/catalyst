@@ -128,11 +128,16 @@ function M.edit_dialogue(state)
 end
 
 function M.persist_dialogue(state)
+  if not state.session:is_dirty() then return end
+
   local user_input =
-      vim.fn.confirm("Remember choice for current directory?", "&Yes\n&No", 2)
+      vim.fn.confirm("Remember choice for current directory?", "&Yes\n&No\nN&ever", 2)
 
   if user_input == 1 then
     st.ps.persist(state.config)
+  elseif user_input == 3 then
+    state.session:keep_clean()
+    print('You won\'t be prompted to persist config choice until the plugin is reloaded.')
   end
 end
 
@@ -211,8 +216,8 @@ function M.picker(state)
   end
 
   local lines = {}
-  for key, _ in pairs(state.config:presets()) do
-    table.insert(lines, Menu.item(key))
+  for k, _ in pairs(state.config:presets()) do
+    table.insert(lines, Menu.item(k))
   end
 
   local pp = st.picker.setup(state.config:presets())

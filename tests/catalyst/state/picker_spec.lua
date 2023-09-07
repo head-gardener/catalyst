@@ -2,9 +2,9 @@ local pp = require('catalyst.state.picker')
 local spy = require('luassert.stub')
 local match = require('luassert.match')
 
-describe('picker state object', function()
-  local presets = { make = 'make', cargo = 'cargo' }
+local presets = { make = 'make', cargo = 'cargo' }
 
+describe('picker state object', function()
   local picker
 
   before_each(function()
