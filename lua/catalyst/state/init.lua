@@ -1,7 +1,6 @@
 local M = {}
 
 -- fields
-local cf = require('catalyst.state.config')
 local ss = require('catalyst.state.session')
 
 -- functional modules

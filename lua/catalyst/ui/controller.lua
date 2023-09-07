@@ -3,17 +3,25 @@ local st = require('catalyst.state')
 
 local M = {}
 
-local function ui_spawner(state)
+local function ui_spawner(state, entry)
   return coroutine.create(function()
-    cm.picker(state)
-    cm.edit_dialogue(state)
+    if entry == "pick" then
+      cm.picker(state)
+    end
+
+    if entry ~= "edit" then
+      cm.edit_dialogue(state)
+    else
+      cm.editor(state)
+    end
+
     cm.persist_dialogue(state)
   end)
 end
 
-local function controller(state)
+local function controller(state, entry)
   return coroutine.create(function()
-    local spawner = ui_spawner(state)
+    local spawner = ui_spawner(state, entry)
     while coroutine.status(spawner) ~= "dead" do
       local ok, obj, post = coroutine.resume(spawner)
       if not ok then
@@ -32,7 +40,12 @@ local function controller(state)
 end
 
 function M.pick(state)
-  local thr = controller(state)
+  local thr = controller(state, "pick")
+  st.ui_ctl.start(state, thr)
+end
+
+function M.edit(state)
+  local thr = controller(state, "edit")
   st.ui_ctl.start(state, thr)
 end
 

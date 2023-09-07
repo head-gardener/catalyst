@@ -6,7 +6,7 @@ local st = require("catalyst.state")
 
 local M = {}
 
-local function make_pair(a, b, on_write)
+local function make_pair(a, b)
   local a_popup = Popup({
     focusable = false,
     buf_options = {
@@ -34,16 +34,10 @@ local function make_pair(a, b, on_write)
         },
       })
 
+  b_popup.config_entry = a
+
   vim.api.nvim_buf_set_lines(a_popup.bufnr, 2, 3, false, { a })
   vim.api.nvim_buf_set_lines(b_popup.bufnr, 0, -1, false, { b })
-
-  b_popup:on("BufLeave", function()
-    -- will only pull one liners
-    local cmd = vim.api.nvim_buf_get_lines(b_popup.bufnr, 0, 1, false)[1]
-    local cfg = {}
-    cfg[a] = cmd
-    on_write(cfg)
-  end)
 
   return a_popup, b_popup
 end
@@ -55,6 +49,16 @@ local function wrap_cfg(state)
   b[1]:on({ "BufUnload" }, function()
     state.ctl:resume()
   end)
+
+  for _, v in pairs(b) do
+    v:on("BufLeave", function()
+      -- will only pull one liners
+      local cmd = vim.api.nvim_buf_get_lines(v.bufnr, 0, 1, false)[1]
+      local cfg = {}
+      cfg[v.config_entry] = cmd
+      state.config:edit(cfg)
+    end)
+  end
 
   local a_bs = {}
   local b_bs = {}
@@ -134,7 +138,7 @@ function M.persist_dialogue(state)
       vim.fn.confirm("Remember choice for current directory?", "&Yes\n&No\nN&ever", 2)
 
   if user_input == 1 then
-    st.ps.persist(state.config)
+    state.ps.persist(state.config)
   elseif user_input == 3 then
     state.session:keep_clean()
     print('You won\'t be prompted to persist config choice until the plugin is reloaded.')

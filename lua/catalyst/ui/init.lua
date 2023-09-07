@@ -4,5 +4,6 @@ local M = {}
 
 -- re-expose controller
 M.pick = cl.pick
+M.edit = cl.edit
 
 return M

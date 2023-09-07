@@ -16,13 +16,10 @@ function M.setup(opts)
   function this:wrap(wrapper)
     local a = {}
     local b = {}
-    local on_write = function(cfg)
-      self:edit(cfg)
-    end
 
-    a[1], b[1] = wrapper("run", self:system().run, on_write)
-    a[2], b[2] = wrapper("build", self:system().build, on_write)
-    a[3], b[3] = wrapper("test", self:system().test, on_write)
+    a[1], b[1] = wrapper("run", self:system().run)
+    a[2], b[2] = wrapper("build", self:system().build)
+    a[3], b[3] = wrapper("test", self:system().test)
 
     return a, b
   end
@@ -32,15 +29,22 @@ function M.setup(opts)
   end
 
   function this:edit(new)
+    local changed = false
+
     if new.run ~= nil and new.run ~= self.sys.run then
       self.sys.run = new.run
+      changed = true
     end
     if new.build ~= nil and new.build ~= self.sys.build then
       self.sys.build = new.build
+      changed = true
     end
     if new.test ~= nil and new.test ~= self.sys.test then
       self.sys.test = new.test
+      changed = true
     end
+
+    return changed
   end
 
   if opts == nil then opts = {} end

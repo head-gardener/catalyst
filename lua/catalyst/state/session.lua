@@ -36,8 +36,9 @@ function M.setup(opts)
   end
 
   function wrap:edit(x)
-    wrap._orig:edit(x)
-    this:mark()
+    if wrap._orig:edit(x) then
+      this:mark()
+    end
   end
 
   -- a hack but should work for now

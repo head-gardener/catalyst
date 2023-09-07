@@ -46,6 +46,7 @@ require('catalyst').setup({
     test = '<Leader>mt',
     build = '<Leader>mb',
     pick = '<Leader>mp',
+    edit = '<Leader>me',
   }
 })
 ```

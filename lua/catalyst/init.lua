@@ -9,7 +9,10 @@ local function set_keymaps(mod, keymaps)
   if keymaps == nil then return end
 
   if keymaps.pick then
-    vim.keymap.set('n', keymaps.pick, mod.pick, { remap = true })
+    vim.keymap.set('n', keymaps.pick, mod.pick, { remap = false })
+  end
+  if keymaps.edit then
+    vim.keymap.set('n', keymaps.edit, mod.edit, { remap = false })
   end
   if keymaps.run then
     vim.keymap.set('n', keymaps.run, mod.run, { remap = false })
@@ -29,26 +32,30 @@ local function setup(opts)
   local function pick()
     ui.pick(state)
   end
-
+  local function edit()
+    ui.edit(state)
+  end
   local function run()
     iron.send('fish', state.config:system().run)
   end
-
   local function build()
     iron.send('fish', state.config:system().build)
   end
-
   local function test()
     iron.send('fish', state.config:system().test)
   end
 
   M.pick = pick
+  M.edit = edit
   M.run = run
   M.build = build
   M.test = test
 
   vim.api.nvim_create_user_command('CatlPick',
     pick,
+    { nargs = '?' })
+  vim.api.nvim_create_user_command('CatlEdit',
+    edit,
     { nargs = '?' })
   vim.api.nvim_create_user_command('CatlRun',
     run,
