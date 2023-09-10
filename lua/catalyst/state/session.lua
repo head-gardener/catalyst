@@ -51,8 +51,8 @@ function M.setup(opts)
   end
 
   local p = {}
-  function p.sync(config)
-    ps.sync(config)
+  function p.sync(state)
+    ps.sync(state)
     this:clear()
   end
 

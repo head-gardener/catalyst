@@ -66,4 +66,24 @@ function M.prettify(a)
   return { "run: " .. a.run, "build: " .. a.build, "test: " .. a.test }
 end
 
+function M.validate(a)
+  return
+      type(a) == "table" and
+      type(a.run) == "string" and
+      type(a.build) == "string" and
+      type(a.test) == "string"
+end
+
+function M.validate_all(a)
+  if not a then return false end
+
+  for k, v in pairs(a) do
+    if not M.validate(v) then
+      return false, k
+    end
+  end
+
+  return true
+end
+
 return M

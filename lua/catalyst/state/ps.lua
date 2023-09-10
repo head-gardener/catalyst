@@ -1,3 +1,5 @@
+local cf = require('catalyst.state.config')
+
 local M = {}
 
 -- might want to replace this with sqlite if performance tanks too much
@@ -7,17 +9,19 @@ local function cfg_path()
   return vim.fn.stdpath('data') .. '/catalyst.json'
 end
 
+--- Read persistent storage.
+-- Returns true, cfg if config is valid,
+-- false, err otherwise
 local function read()
   local path = cfg_path()
   local storage = io.open(path, 'r')
   if storage == nil then
-    return {}
+    return true, {}
   end
   local data = storage:read()
-  local cfg = vim.fn.json_decode(data)
   storage:close()
 
-  return cfg
+  return pcall(vim.fn.json_decode, data)
 end
 
 local function write(pers_conf)
@@ -48,10 +52,19 @@ function M.persist(config)
   end)
 end
 
-function M.sync(config)
-  local pers_conf = read()[vim.fn.getcwd()]
-  if pers_conf ~= nil then
-    config:set(pers_conf.build_system)
+function M.sync(state)
+  local s, conf = read()
+  if not s or not conf then
+    error('malformed storage file: ' .. conf)
+  end
+
+  local pers_conf = conf[vim.fn.getcwd()]
+  if not pers_conf then return end
+
+  if not cf.validate(pers_conf.build_system) then
+    error('malformed config stored for ' .. vim.fn.getcwd())
+  else
+    state.config:set(pers_conf.build_system)
   end
 end
 
