@@ -1,18 +1,24 @@
 local M = {}
 
-function M.start(state, thr)
-  local ctl = { thr = thr }
+function M.setup()
+  local this = {}
 
-  function ctl:resume()
+  function this:start(thr)
+    self.thr = thr
+    self:resume()
+  end
+
+  function this:resume()
     coroutine.resume(self.thr)
   end
 
-  function ctl:yield()
+  -- function this:finish()
+
+  function this:yield()
     coroutine.yield()
   end
 
-  state.ctl = ctl
-  state.ctl:resume()
+  return this
 end
 
 return M

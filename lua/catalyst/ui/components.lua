@@ -47,7 +47,7 @@ local function wrap_cfg(state)
 
   -- is this correct?
   b[1]:on({ "BufUnload" }, function()
-    state.ctl:resume()
+    state.ui_ctl:resume()
   end)
 
   for _, v in pairs(b) do
@@ -212,7 +212,7 @@ function M.picker(state)
       end,
       on_submit = function()
         pp:confirm(s.config)
-        state.ctl:resume()
+        state.ui_ctl:resume()
       end,
     })
 

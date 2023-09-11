@@ -2,11 +2,11 @@ local M = {}
 
 -- fields
 local ss = require('catalyst.state.session')
+local ct = require('catalyst.state.ui_ctl')
 
 -- functional modules
 M.ps = require('catalyst.state.ps')
 M.picker = require('catalyst.state.picker')
-M.ui_ctl = require('catalyst.state.ui_ctl')
 
 -- re-exposed functions
 M.prettify = require('catalyst.state.config').prettify
@@ -17,6 +17,7 @@ function M.setup(opts)
     config = s.config,
     ps = s.ps,
     session = s,
+    ui_ctl = ct.setup(),
   }
 end
 

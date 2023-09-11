@@ -3,6 +3,8 @@ local cf = require('catalyst.state.config')
 local ps = require('catalyst.state.ps')
 local mock = require('luassert.mock')
 
+mock(ps, true)
+
 local opts = {
   presets = {
     make = { run = "build/bin", build = "make build", test = "make check" },
@@ -70,8 +72,6 @@ describe('session storage', function()
     end)
 
     it('clears after ps calls', function()
-      mock(ps, true)
-
       session:mark()
       assert.is._true(session:is_dirty())
       session.ps.sync()
@@ -83,7 +83,7 @@ describe('session storage', function()
       assert.is._false(session:is_dirty())
     end)
 
-    it('keep_clean works', function ()
+    it('keep_clean works', function()
       session:mark()
       session:keep_clean()
       assert.is._false(session:is_dirty())
