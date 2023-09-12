@@ -40,7 +40,12 @@ end
 --- Mutate persistent storage.
 -- @param f function that mutates `cfg` passed.
 local function update(f)
-  local cfg = read()
+  local ok, cfg = read()
+  if not ok then
+    error(
+      'Fix storage file before attempting to write to it. Error: '
+      .. cfg)
+  end
   f(cfg)
   write(cfg)
 end

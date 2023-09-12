@@ -10,7 +10,7 @@ describe('persistant storage manager', function()
       closed = false
       return {
         read = function()
-          return '///./'
+          return 'abba'
         end,
         close = function()
           assert.is_false(closed)
@@ -19,6 +19,7 @@ describe('persistant storage manager', function()
       }
     end
 
+    assert.error_matches(ps.persist, '.-abba')
     assert.errors(ps.sync)
     assert.is_true(closed)
   end)
