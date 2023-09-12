@@ -29,13 +29,10 @@ local function controller(state, entry)
     while coroutine.status(spawner) ~= "dead" do
       local ok, obj, post = coroutine.resume(spawner)
       if not ok then
-        print(obj)
-        error()
+        error(obj, 2)
       else
-        obj:mount()
-        if post ~= nil then
-          post()
-        end
+        if obj then obj:mount() end
+        if post then post() end
       end
       state.ui_ctl:yield()
     end

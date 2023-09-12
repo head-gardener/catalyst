@@ -4,6 +4,12 @@ local Layout = require("nui.layout")
 
 local st = require("catalyst.state")
 
+-- All UI components should be represented by an exposed function,
+-- that yields NUI component and a post-mount callback, both can
+-- be nil when not needed.
+-- Might change this to returning instead of yielding and wrap all
+-- the functions if the need arises.
+
 local M = {}
 
 local function make_pair(a, b)
@@ -143,6 +149,8 @@ function M.persist_dialogue(state)
     state.session:keep_clean()
     print('You won\'t be prompted to persist config choice until the plugin is reloaded.')
   end
+
+  coroutine.yield()
 end
 
 function M.picker(state)
