@@ -8,11 +8,20 @@ function M.setup()
     self:resume()
   end
 
+  -- one day I really should ponder a bit on how exactly does this work
   function this:resume()
-    coroutine.resume(self.thr)
+    local ok, err = coroutine.resume(self.thr)
+    if not ok then
+      self.thr = nil
+      error(err, 3)
+    end
   end
 
-  -- function this:finish()
+  function this:up()
+    return
+        type(self.thr) == "thread" and
+        coroutine.status(self.thr) ~= "dead"
+  end
 
   function this:yield()
     coroutine.yield()
