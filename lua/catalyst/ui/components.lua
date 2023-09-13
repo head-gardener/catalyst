@@ -12,6 +12,12 @@ local st = require("catalyst.state")
 
 local M = {}
 
+local keymaps = {
+  close = { "<Esc>", "<C-c>", "<CR>" },
+  next = { "j", "<Down>", "<Tab>" },
+  prev = { "k", "<Up>", "<S-Tab>" },
+}
+
 local function make_pair(a, b)
   local a_popup = Popup({
     focusable = false,
@@ -99,22 +105,32 @@ local function wrap_cfg(state)
     local ids = {}
     for i = 1, #b do
       ids[i] = b[i].winid
+
+      for _, v in pairs(keymaps.close) do
+        b[i]:map("n", v, function(_)
+          b[i]:unmount()
+        end, { noremap = true, nowait = true })
+      end
     end
 
     for i = 1, #b - 1 do
-      b[i]:map("n", "j", function(_)
-        vim.schedule(function()
-          vim.api.nvim_set_current_win(ids[i + 1])
-        end)
-      end, { noremap = true })
+      for _, v in pairs(keymaps.next) do
+        b[i]:map("n", v, function(_)
+          vim.schedule(function()
+            vim.api.nvim_set_current_win(ids[i + 1])
+          end)
+        end, { noremap = true, nowait = true })
+      end
     end
 
     for i = 2, #b do
-      b[i]:map("n", "k", function(_)
-        vim.schedule(function()
-          vim.api.nvim_set_current_win(ids[i - 1])
-        end)
-      end, { noremap = true })
+      for _, v in pairs(keymaps.prev) do
+        b[i]:map("n", v, function(_)
+          vim.schedule(function()
+            vim.api.nvim_set_current_win(ids[i - 1])
+          end)
+        end, { noremap = true, nowait = true })
+      end
     end
 
     -- local bid2 = b[2].winid
