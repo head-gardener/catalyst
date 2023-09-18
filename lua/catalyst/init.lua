@@ -69,10 +69,10 @@ local function setup(opts)
 
   vim.api.nvim_create_autocmd('DirChanged', {
     callback = function()
-      st.ps.sync(state)
+      state.ps.sync(state)
     end,
   })
-  st.ps.sync(state)
+  state.ps.sync(state)
 
   set_keymaps(M, opts.keymaps)
 end

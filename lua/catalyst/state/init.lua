@@ -5,7 +5,6 @@ local ss = require('catalyst.state.session')
 local ct = require('catalyst.state.ui_ctl')
 
 -- functional modules
-M.ps = require('catalyst.state.ps')
 M.picker = require('catalyst.state.picker')
 
 -- re-exposed functions
