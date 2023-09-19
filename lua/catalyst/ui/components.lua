@@ -10,6 +10,11 @@ local st = require("catalyst.state")
 -- Might change this to returning instead of yielding and wrap all
 -- the functions if the need arises.
 
+EDITOR_TOOLTIP = {
+  'h/j/k/l/... -> pick',
+  'Esc/CF/Quit -> save'
+}
+
 local M = {}
 
 local keymaps = {
@@ -26,7 +31,7 @@ local function make_pair(a, b)
       readonly = true,
     },
     win_options = {
-      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
     },
     border = {
       padding = { 0, 2 },
@@ -62,6 +67,7 @@ local function wrap_cfg(state)
     state.ui_ctl:resume()
   end)
 
+  -- save edits on BufLeave
   for _, v in pairs(b) do
     v:on("BufLeave", function()
       -- will only pull one liners
@@ -79,20 +85,42 @@ local function wrap_cfg(state)
     b_bs[i] = Layout.Box(b[i], { grow = 1 })
   end
 
+  local tooltip = Popup({
+    focusable = false,
+    buf_options = {
+      modifiable = false,
+      readonly = true,
+    },
+    win_options = {
+      winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+    },
+    border = {
+      style = 'single',
+      padding = { 0, 2 },
+    },
+  })
+  vim.api.nvim_buf_set_lines(tooltip.bufnr, 0, 0, false, EDITOR_TOOLTIP)
+
+  local editor_height = #a * 3
+  local tooltip_height = 2 + #EDITOR_TOOLTIP
+
   local p = Layout(
     {
       relative = "editor",
       position = "50%",
-      grow = 2,
+      grow = 1,
       size = {
         width = 80,
-        height = 10,
+        height = editor_height + tooltip_height,
       },
     },
     Layout.Box({
-      Layout.Box(a_bs, { dir = "col", size = 13 }),
-      Layout.Box(b_bs, { dir = "col", grow = 1 }),
-    }, { dir = "row" })
+      Layout.Box({
+        Layout.Box(a_bs, { dir = "col", size = 13 }),
+        Layout.Box(b_bs, { dir = "col", grow = 1 }),
+      }, { dir = "row", size = editor_height }),
+      Layout.Box(tooltip, { size = tooltip_height })
+    }, { dir = "col" })
   )
 
   return p, function()
