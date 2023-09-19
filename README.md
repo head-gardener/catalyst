@@ -1,8 +1,11 @@
 # Catalyst
 
-![image](https://github.com/head-gardener/catalyst/assets/49650767/c3ce0530-da78-4253-9caf-de411ee30c40)
+![2023-09-19_13:19:55](https://github.com/head-gardener/catalyst/assets/49650767/6a1f627e-d3e2-4e5d-b2c8-42cfb61824c6)
 
-Quick project configuration for neovim.
+Quick and extendable project configuration for neovim.
+- Presets and interface that doesn't interrupt your workflow.
+- Simple configuration persistance with JSON.
+- Edit saved commands or add new ones on per project basis.
 
 # Install
 
