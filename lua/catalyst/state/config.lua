@@ -11,7 +11,6 @@ DEFAULT_COMMAND = {
 
 function M.setup(opts)
   local this = {}
-  local optional = {}
 
   function this:presets()
     return self.ps
@@ -24,10 +23,14 @@ function M.setup(opts)
   function this:wrap(wrapper)
     local a = {}
     local b = {}
+    local s = self:system()
+    if not s then error('config is nil') end
 
-    a[1], b[1] = wrapper('run', self:system().run)
-    a[2], b[2] = wrapper('build', self:system().build)
-    a[3], b[3] = wrapper('test', self:system().test)
+    for _, v in pairs(self.cmds) do
+      local ai, bi = wrapper(v, s[v] or '')
+      table.insert(a, ai)
+      table.insert(b, bi)
+    end
 
     return a, b
   end
@@ -39,25 +42,35 @@ function M.setup(opts)
   function this:edit(new)
     local changed = false
 
-    if new.run ~= nil and new.run ~= self.sys.run then
-      self.sys.run = new.run
-      changed = true
-    end
-    if new.build ~= nil and new.build ~= self.sys.build then
-      self.sys.build = new.build
-      changed = true
-    end
-    if new.test ~= nil and new.test ~= self.sys.test then
-      self.sys.test = new.test
-      changed = true
+    for _, v in pairs(self.cmds) do
+      if
+          new[v] == nil or
+          new[v] == '' and self.sys[v] == nil
+      then
+        goto continue
+      end
+
+      if new[v] == '' and not DEFAULT_COMMAND[v] and self.sys[v] ~= nil then
+        -- delete opt cmd with empty string
+        self.sys[v] = nil
+        changed = true
+      elseif new[v] ~= self.sys[v] then
+        self.sys[v] = new[v]
+        changed = true
+      end
+
+      ::continue::
     end
 
     return changed
   end
 
   function this:valid(a)
+    -- PERF: this could be done better, especially knowing that
+    -- validation is mostly ran on startup
+
     if type(a) ~= 'table' then return false end
-    for _, v in pairs(self.optional) do
+    for _, v in pairs(self.cmds) do
       if type(a[v]) ~= 'nil' and type(a[v]) ~= 'string' then
         return false
       end
@@ -90,17 +103,18 @@ function M.setup(opts)
   local sys = nil
   if p ~= nil then sys = ps[p] end
 
-  local opt = {}
+  -- commands should be in a specific order
+  local cmds = { 'run', 'build', 'test' }
   for _, v in pairs(opts.functions) do
     local f = v[1]
     if not DEFAULT_COMMAND[f] then
-      table.insert(opt, f)
+      table.insert(cmds, f)
     end
   end
 
   this.ps = ps
   this.sys = sys
-  this.optional = opt
+  this.cmds = cmds
 
   return this
 end

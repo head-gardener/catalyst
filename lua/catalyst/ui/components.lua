@@ -12,7 +12,7 @@ local st = require("catalyst.state")
 
 EDITOR_TOOLTIP = {
   'h/j/k/l/... -> pick',
-  'Esc/CF/Quit -> save'
+  'Esc/CF/Quit -> save',
 }
 
 local M = {}
@@ -129,7 +129,8 @@ local function wrap_cfg(state)
     -- unavailable until buffer is mounted.
 
     -- b[i].winid doesn't survive till the callback
-    -- and should be saved separately
+    -- and should be saved separately.
+    -- also map some common keys.
     local ids = {}
     for i = 1, #b do
       ids[i] = b[i].winid
@@ -160,9 +161,6 @@ local function wrap_cfg(state)
         end, { noremap = true, nowait = true })
       end
     end
-
-    -- local bid2 = b[2].winid
-    -- print(bid2)
   end
 end
 

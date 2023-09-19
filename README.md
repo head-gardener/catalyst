@@ -98,5 +98,5 @@ require('catalyst').setup({
 Use `functions` field to add keybinds automatically (or leave second field blank to avoid that) and add custom commands.
 
 - Default actions will be added automatically (which makes `pick` and `edit` fields in the example redundant).
-- Second field in the table will be used as a key for the bind if available, otherwise no bind is created.
+- Second field in the table will be used as a key for the bind if available, otherwise no bind is created. If you don't care about keybinds, use shorter syntax: `functions = { { 'watch' } }`.
 - Any extra commands (like `watch`) will behave similarly to regular actions and can be used to trigger relevant fields in a preset when the later are included.
