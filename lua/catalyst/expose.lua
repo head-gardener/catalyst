@@ -2,6 +2,8 @@ local ui = require("catalyst.ui")
 local iron = require("iron.core")
 
 return function(M, opts, state)
+  local shell = opts.shell or 'bash'
+
   function M.pick()
     ui.pick(state)
   end
@@ -16,7 +18,7 @@ return function(M, opts, state)
     -- generate missing calls to config commands
     if not M[k] then
       M[k] = function()
-        iron.send('fish', state.config:system()[k])
+        iron.send(shell, state.config:system()[k])
       end
     end
 

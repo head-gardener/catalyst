@@ -47,6 +47,7 @@ require('catalyst').setup({
     build = '<Leader>mb',
     pick = '<Leader>mp',
     edit = '<Leader>me',
-  }
+  },
+  shell = 'fish',
 })
 ```
