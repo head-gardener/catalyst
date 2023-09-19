@@ -16,7 +16,6 @@ return function(M, opts, state)
   function M.test() iron.send(shell, state.config:system().test) end
 
   if not opts.functions then return end
-
   for _, v in pairs(opts.functions) do
     -- schema
     local f = v[1]

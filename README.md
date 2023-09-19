@@ -85,11 +85,15 @@ require('catalyst').setup({
     { 'run',   '<Leader>mm' },
     { 'test',  '<Leader>mt' },
     { 'build', '<Leader>mb' },
-    { 'pick',  },
-    { 'edit',  },
+    { 'pick', },
+    { 'edit', },
     { 'watch', '<Leader>mw' },
   },
 })
 ```
+ **(WIP)**
+Use `functions` field to add keybinds automatically (or leave second field blank to avoid that) and add custom commands.
 
-Use `functions` field to add keybinds automatically (or leave second field blank to avoid that) and add custom commands **(WIP)**.
+- Default actions will be added automatically (which makes `pick` and `edit` fields in the example redundant).
+- Second field in the table will be used as a key for the bind if available, otherwise no bind is created.
+- Any extra commands (like `watch`) will behave similarly to regular actions and can be used to trigger relevant fields in a preset when the later are included.

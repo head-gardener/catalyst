@@ -66,7 +66,7 @@ function M.sync(state)
   local pers_conf = conf[vim.fn.getcwd()]
   if not pers_conf then return end
 
-  if not cf.validate(pers_conf.build_system) then
+  if not state.config:valid(pers_conf.build_system) then
     error('malformed config stored for ' .. vim.fn.getcwd())
   else
     state.config:set(pers_conf.build_system)
