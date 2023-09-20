@@ -161,6 +161,8 @@ local function wrap_cfg(state)
         end, { noremap = true, nowait = true })
       end
     end
+
+    vim.api.nvim_set_current_win(ids[1])
   end
 end
 
