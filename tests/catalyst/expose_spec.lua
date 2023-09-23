@@ -1,13 +1,23 @@
+local DEFAULT_COMMAND = require('catalyst.state.config').DEFAULT_COMMAND
 local expose = require('catalyst.expose')
 
 describe('expose function', function()
+  local keymaps = {}
+  local commands = {}
+
+  vim.api.nvim_create_user_command = function(a, _, _)
+    commands[a] = true
+  end
+  vim.keymap.set = function(_, key)
+    keymaps[key] = true
+  end
+
+  before_each(function()
+    commands = {}
+    keymaps = {}
+  end)
+
   it('can parse compete function list', function()
-    local keymaps = {}
-    vim.keymap.set = function(_, key)
-      keymaps[key] = true
-    end
-
-
     M = {}
     expose(M, {
       functions = {
@@ -34,10 +44,10 @@ describe('expose function', function()
   it('always adds default functions', function()
     expose(M, {}, {})
 
-    assert.is.Function(M.run)
-    assert.is.Function(M.build)
-    assert.is.Function(M.test)
-    assert.is.Function(M.edit)
-    assert.is.Function(M.pick)
+    for k, _ in pairs(DEFAULT_COMMAND) do
+      assert.is.Function(M[k], k .. ' func missing')
+      assert.is.True(commands['Catl' .. (k:gsub("^%l", string.upper))], k .. ' cmd missing')
+      assert.is.Nil(keymaps[k], k .. ' keymap')
+    end
   end)
 end)

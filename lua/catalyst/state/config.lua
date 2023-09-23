@@ -1,7 +1,7 @@
 local M = {}
 
 DEFAULT_PRESETS = { make = { run = 'build/bin', build = 'make build', test = 'make check' } }
-DEFAULT_COMMAND = {
+M.DEFAULT_COMMAND = {
   run = true,
   build = true,
   test = true,
@@ -50,7 +50,7 @@ function M.setup(opts)
         goto continue
       end
 
-      if new[v] == '' and not DEFAULT_COMMAND[v] and self.sys[v] ~= nil then
+      if new[v] == '' and not M.DEFAULT_COMMAND[v] and self.sys[v] ~= nil then
         -- delete opt cmd with empty string
         self.sys[v] = nil
         changed = true
@@ -107,7 +107,7 @@ function M.setup(opts)
   local cmds = { 'run', 'build', 'test' }
   for _, v in pairs(opts.functions) do
     local f = v[1]
-    if not DEFAULT_COMMAND[f] then
+    if not M.DEFAULT_COMMAND[f] then
       table.insert(cmds, f)
     end
   end
@@ -123,7 +123,7 @@ function M.prettify(a)
   local r = { 'run: ' .. a.run, 'build: ' .. a.build, 'test: ' .. a.test }
 
   for k, v in pairs(a) do
-    if not DEFAULT_COMMAND[k] then
+    if not M.DEFAULT_COMMAND[k] then
       table.insert(r, k .. ': ' .. v)
     end
   end
