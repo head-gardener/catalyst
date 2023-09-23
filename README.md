@@ -30,6 +30,17 @@ On dependencies:
 | :zap: First, configure `iron.nvim` to be able to run your favorite shell. |
 |----------------------------------------------------------------------------|
 
+### `iron.nvim` setup
+
+```lua
+require('iron.core').setup {
+  config = {
+    repl_definition = { bash = { command = { "bash" } } },
+  },
+}
+```
+Should suffice, but don't get stuck with this lame config.
+
 ### My favorite shell?
 
 ```lua
@@ -39,7 +50,7 @@ catalyst.setup({ shell = 'fish' })
 ...
 ```
 
-Or leave blank if you use bash.
+Or leave blank if you use bash. Notice, that the value should work with `iron.send()`, i.e. not the shell's name but the repl's from `iron`'s setup.
 
 ### I don't care, give me the defaults
 
